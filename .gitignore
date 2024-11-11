@@ -27,7 +27,7 @@
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-.gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
