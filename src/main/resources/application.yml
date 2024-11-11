@@ -1,0 +1,27 @@
+server:
+    port: 8080
+
+spring:
+    application:
+        name: voicecut-api
+
+    cors:
+        allowed-origins: ${ALLOWED_ORIGINS}
+        allowed-methods: ${ALLOWED_METHODS}
+
+    datasource:
+        url: jdbc:mysql://${MYSQL_URL}
+        username: ${MYSQL_USERNAME}
+        password: ${MYSQL_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+
+    jpa:
+        hibernate:
+            ddl-auto: update  #create-drop
+        properties:
+            hibernate:
+                format_sql: true
+                highlight_sql: true
+
+    output:
+        ansi.enabled: always
