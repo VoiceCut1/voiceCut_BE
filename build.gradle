@@ -39,6 +39,9 @@ dependencies {
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// Ollama
+	implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
+
 	// JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
