@@ -1,0 +1,61 @@
+buildscript {
+	repositories {
+		google()
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.google.gms:google-services:4.3.10'  // Firebase 사용 시 필요
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.5'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+allprojects {
+	repositories {
+		google()  // Google Maven 저장소 추가
+		mavenCentral()  // Maven Central 추가
+	}
+}
+
+dependencies {
+	// Firebase Admin SDK
+	implementation 'com.google.firebase:firebase-admin:9.1.1'
+
+	// Other dependencies
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	google()  // Google Maven 저장소 추가
+	mavenCentral()
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
