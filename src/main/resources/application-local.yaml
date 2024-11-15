@@ -5,3 +5,9 @@ openai:
     model: ${OPENAI_GPT_MODEL}
   whisper:
     url: ${OPENAI_WHISPER_URL}
+
+coolsms:
+  key: ${COOLSMS-KEY}
+  secret-key: ${COOLSMS-SECRET-KEY}
+  domain: ${COOLSMS-DOMAIN}
+  calling-number: ${COOLSMS-CALLING-NUMBER}
