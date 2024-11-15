@@ -1,5 +1,6 @@
 package hackathon.voice_cut_1.voice_cut_1.controller;
 
+import hackathon.voice_cut_1.voice_cut_1.dto.VoicePhishingAnalysisResultDto;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
 import hackathon.voice_cut_1.voice_cut_1.request.AnalysisVoicePhishingRequest;
 import hackathon.voice_cut_1.voice_cut_1.response.ErrorResponse;
@@ -21,9 +22,9 @@ public class VoicePhishingAnalysisController {
     public ResponseEntity<VoicePhishingAnalysisResponse> analysisVoicePhishing(
             @Valid AnalysisVoicePhishingRequest request
     ) {
-        String text = voicePhishingAnalysisService.analysisVoicePhishing(request.uuid(), request.voiceFile());
+        VoicePhishingAnalysisResultDto resultDto = voicePhishingAnalysisService.analysisVoicePhishing(request.uuid(), request.voiceFile());
 
-        return ResponseEntity.ok(new VoicePhishingAnalysisResponse(text));
+        return ResponseEntity.ok(new VoicePhishingAnalysisResponse(resultDto.content(), resultDto.percent()));
     }
 
     @ExceptionHandler(ElderNotFoundException.class)
