@@ -11,16 +11,13 @@ public class LlamaAiServiceImpl implements LlamaAiService {
     @Autowired
     private  OllamaChatClient chatClient;
 
-
     @Override
     public LlamaResponse generateMessage(String promptMessage) {
-        final String llamaMessage = chatClient.generate(promptMessage);
-        return new LlamaResponse().setMessage(llamaMessage);
+        return chatClient.generate(promptMessage);
     }
 
     @Override
-    public LlamaResponse generateJoke(String topic) {
-        final String llamaMessage = chatClient.generate(String.format("Tell me a joke about %s", topic));
-        return new LlamaResponse().setMessage(llamaMessage);
+    public LlamaResponse generateVoiceCut(String topic) {
+        return chatClient.generate(String.format("Tell me a joke about %s", topic));
     }
 }

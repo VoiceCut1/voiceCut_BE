@@ -4,5 +4,5 @@ import com.voicecut.api.llama.response.LlamaResponse;
 
 public interface LlamaAiService {
     LlamaResponse generateMessage(String prompt);
-    LlamaResponse generateJoke(String topic);
+    LlamaResponse generateVoiceCut(String topic);
 }
