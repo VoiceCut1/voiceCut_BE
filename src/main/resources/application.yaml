@@ -1,3 +1,5 @@
 spring:
   application:
     name: voice_cut_1
+  profiles:
+    active: local
