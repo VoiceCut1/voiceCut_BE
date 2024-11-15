@@ -1,10 +1,4 @@
 package com.voicecut.api.llama.response;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
+public record LlamaResponse(String response, String createdAt, String model) {}
 
-@Data
-@Accessors(chain = true)
-public class LlamaResponse {
-    private String message;
-}

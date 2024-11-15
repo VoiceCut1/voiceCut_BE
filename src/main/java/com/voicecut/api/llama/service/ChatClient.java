@@ -1,5 +1,7 @@
 package com.voicecut.api.llama.service;
 
+import com.voicecut.api.llama.response.LlamaResponse;
+
 public interface ChatClient {
-    String generate(String prompt);
+    LlamaResponse generate(String prompt);
 }
