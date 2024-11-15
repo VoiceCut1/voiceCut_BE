@@ -21,7 +21,7 @@ public class ElderService {
     ) {
         String uuid = UUID.randomUUID().toString();
 
-        redisTemplate.opsForValue().set(uuid, new Elder(nickname, guardianNumbers), 1, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(uuid, new Elder(nickname, guardianNumbers, false), 1, TimeUnit.DAYS);
 
         return uuid;
     }
