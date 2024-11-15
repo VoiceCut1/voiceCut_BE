@@ -188,7 +188,7 @@ Temporary Items
 /.idea/git_toolbox_prj.xml
 
 ### Local ###
-.env
+local.env
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,intellij,java
 
