@@ -1,4 +1,7 @@
 openai:
   key: ${OPENAI_KEY}
+  gpt:
+    url: ${OPENAI_GPT_URL}
+    model: ${OPENAI_GPT_MODEL}
   whisper:
     url: ${OPENAI_WHISPER_URL}
