@@ -1,0 +1,4 @@
+openai:
+  key: ${OPENAI_KEY}
+  whisper:
+    url: ${OPENAI_WHISPER_URL}

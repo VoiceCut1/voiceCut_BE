@@ -3,3 +3,6 @@ spring:
     name: voice_cut_1
   profiles:
     active: local
+  servlet:
+    multipart:
+      max-file-size: 10MB
