@@ -1,4 +1,4 @@
 package com.voicecut.api.openai.dto;
 
-public record RiskAssessmentResponse(double riskScore) {
+public record RiskAssessmentResponse(int riskScore) {
 }

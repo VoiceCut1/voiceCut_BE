@@ -24,8 +24,7 @@ public class OpenAiConfig {
 
     @Bean
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate;
+        return new RestTemplate();
     }
 
     @Bean
@@ -33,12 +32,6 @@ public class OpenAiConfig {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(openAiKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + openAiKey);
         return headers;
-    }
-
-    @Bean
-    public String model() {
-        return this.model;
     }
 }

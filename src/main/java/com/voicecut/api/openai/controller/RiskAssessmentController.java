@@ -2,7 +2,6 @@ package com.voicecut.api.openai.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.voicecut.api.openai.dto.RiskAssessmentRequest;
-import com.voicecut.api.openai.dto.RiskAssessmentResponse;
 import com.voicecut.api.openai.service.RiskAssessmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ public class RiskAssessmentController {
         this.riskAssessmentService = riskAssessmentService;
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<String> gptRisk(@RequestBody RiskAssessmentRequest request) throws JsonProcessingException {
         return riskAssessmentService.assessRisk(request);
     }
