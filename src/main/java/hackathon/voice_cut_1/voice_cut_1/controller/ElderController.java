@@ -3,6 +3,7 @@ package hackathon.voice_cut_1.voice_cut_1.controller;
 import hackathon.voice_cut_1.voice_cut_1.request.SaveElderInformationRequest;
 import hackathon.voice_cut_1.voice_cut_1.response.SaveElderInformationResponse;
 import hackathon.voice_cut_1.voice_cut_1.service.ElderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class ElderController {
 
     @PostMapping
     public ResponseEntity<SaveElderInformationResponse> saveElderInformation(
-            @RequestBody SaveElderInformationRequest request
+            @Valid @RequestBody SaveElderInformationRequest request
     ) {
         String uuid = elderService.saveElderInformationFromRedis(request.nickname(), request.guardianNumbers());
 
