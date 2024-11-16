@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -77,6 +78,13 @@ public class VoicePhishingAnalysisService {
                     discordNotificationService.sendExceptionMessageAsync(getOpenAiExceptionMessage(throwable));
                     return null;
                 });
+
+        // MultipartFile 생명주기 문제 확인
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            log.error("sleep: {}", e.getMessage());
+        }
     }
 
     private String getOpenAiExceptionMessage(Throwable throwable) {
