@@ -1,6 +1,6 @@
 package hackathon.voice_cut_1.voice_cut_1.controller;
 
-import com.example.voicecut1.service.NotificationService;
+import hackathon.voice_cut_1.voice_cut_1.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
