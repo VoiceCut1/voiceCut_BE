@@ -1,5 +1,7 @@
 package hackathon.voice_cut_1.voice_cut_1.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hackathon.voice_cut_1.voice_cut_1.entity.Elder;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,9 @@ public class VoicePhishingAnalysisService {
     private final OpenAiService openAiService;
     private final FcmService fcmService;
     private final SmsService smsService;
+    private final DiscordNotificationService discordNotificationService;
+
+    private final ObjectMapper objectMapper;
 
     public void analysisVoicePhishing(
             String uuid,
@@ -30,7 +35,6 @@ public class VoicePhishingAnalysisService {
             throw new ElderNotFoundException();
         }
 
-        // TODO: 예외 처리 추가
         openAiService.convertSpeechToTextAsync(voiceFile)
                 .thenCompose(text -> openAiService.analyzeTextAsync(text)
                         .thenApply(percent -> Map.of("text", text, "percent", percent)))
@@ -38,20 +42,63 @@ public class VoicePhishingAnalysisService {
                     String text = (String) result.get("text");
                     int percent = (Integer) result.get("percent");
 
-                    log.info("text: {}, percent: {}", text, percent);
+                    log.debug("text: {}, percent: {}", text, percent);
 
                     if (percent >= 80 && percent < 90 && !elder.isSendMessageAt80Percent()) {
-                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!");
-
-                        redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, false));
-
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!")
+                                .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, elder.isSendMessageAt90Percent())))
+                                .exceptionally(throwable -> {
+                                    discordNotificationService.sendExceptionMessageAsync(getFcmExceptionMessage(throwable));
+                                    return null;
+                                });
                     } else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
-                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!");
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!")
+                                .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, elder.isSendMessageAt90Percent())))
+                                .exceptionally(throwable -> {
+                                    discordNotificationService.sendExceptionMessageAsync(getFcmExceptionMessage(throwable));
+                                    return null;
+                                });
 
-                        // TODO: 예외 처리 추가
                         smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers())
-                                .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, true)));
+                                .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, true)))
+                                .exceptionally(throwable -> {
+                                    discordNotificationService.sendExceptionMessageAsync(getSmsExceptionMessage(throwable));
+                                    return null;
+                                });
                     }
+                })
+                .exceptionally(throwable -> {
+                    discordNotificationService.sendExceptionMessageAsync(getOpenAiExceptionMessage(throwable));
+                    return null;
                 });
+    }
+
+    private String getOpenAiExceptionMessage(Throwable throwable) {
+        try {
+            String message = throwable.getMessage();
+
+            return "OpenAI Exception: " + objectMapper
+                    .readTree(message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1))
+                    .at("/error/message")
+                    .asText();
+        } catch (JsonProcessingException exception) {
+            return "OpenAI Exception: OPENAI_EXCEPTION_MESSAGE_PARSING_FAILED";
+        }
+    }
+
+    private String getFcmExceptionMessage(Throwable throwable) {
+        String message = throwable.getMessage();
+
+        String[] strings = message.split(": ");
+
+        return "FCM Exception: " + strings[1];
+    }
+
+    private String getSmsExceptionMessage(Throwable throwable) {
+        String message = throwable.getMessage();
+
+        String[] strings = message.split(": ");
+
+        return "SMS Exception: " + strings[1];
     }
 }

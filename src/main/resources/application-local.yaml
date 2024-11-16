@@ -11,3 +11,7 @@ coolsms:
   secret-key: ${COOLSMS-SECRET-KEY}
   domain: ${COOLSMS-DOMAIN}
   calling-number: ${COOLSMS-CALLING-NUMBER}
+
+discord:
+  webhook:
+    url: ${DISCORD-WEBHOOK-URL}
