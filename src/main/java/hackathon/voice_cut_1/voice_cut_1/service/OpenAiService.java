@@ -38,7 +38,7 @@ public class OpenAiService {
             String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
             return CompletableFuture.completedFuture(text);
         } catch (Exception e) {
-            log.info("check2-2 error");
+            log.info("check2-2 error: {}", e.getMessage());
             return CompletableFuture.failedFuture(new RuntimeException("check2-2 error"));
         }
     }
@@ -66,7 +66,7 @@ public class OpenAiService {
             int percent = Integer.parseInt(response.choices().get(0).message().content());
             return CompletableFuture.completedFuture(percent);
         } catch (Exception e) {
-            log.info("check3-2 error");
+            log.info("check3-2 error: {}", e.getMessage());
             return CompletableFuture.failedFuture(new RuntimeException("check3-2 error"));
         }
     }
