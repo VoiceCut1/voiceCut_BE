@@ -1,16 +1,20 @@
 package hackathon.voice_cut_1.voice_cut_1.service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import hackathon.voice_cut_1.voice_cut_1.exception.FcmSendFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 public class FcmService {
 
-    public void sendFcmToSelfAsync(
+    public CompletableFuture<Void> sendFcmToSelfAsync(
             String fcmToken,
             String body
     ) {
@@ -24,7 +28,14 @@ public class FcmService {
                 )
                 .build();
 
-        // TODO: 예외 처리 추가
-        FirebaseMessaging.getInstance().sendAsync(message);
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                FirebaseMessaging.getInstance().send(message);
+
+                return null;
+            } catch (FirebaseMessagingException e) {
+                throw new FcmSendFailedException();
+            }
+        });
     }
 }

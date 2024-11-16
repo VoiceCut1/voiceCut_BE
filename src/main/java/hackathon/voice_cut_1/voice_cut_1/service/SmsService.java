@@ -41,13 +41,12 @@ public class SmsService {
             messages.add(message);
         }
 
-        // TODO: 예외 처리 추가
-        try {
-            messageService.send(messages);
-        } catch (NurigoMessageNotReceivedException | NurigoEmptyResponseException | NurigoUnknownException exception) {
-            throw new SmsSendFailedException();
-        }
-
-        return CompletableFuture.completedFuture(null);
+        return CompletableFuture.runAsync(() -> {
+            try {
+                messageService.send(messages);
+            } catch (NurigoMessageNotReceivedException | NurigoEmptyResponseException | NurigoUnknownException exception) {
+                throw new SmsSendFailedException();
+            }
+        });
     }
 }
