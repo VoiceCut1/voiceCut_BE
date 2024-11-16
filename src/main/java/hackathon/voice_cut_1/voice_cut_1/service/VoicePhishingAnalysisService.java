@@ -42,7 +42,7 @@ public class VoicePhishingAnalysisService {
                     String text = (String) result.get("text");
                     int percent = (Integer) result.get("percent");
 
-                    log.debug("text: {}, percent: {}", text, percent);
+                    log.info("text: {}, percent: {}", text, percent);
 
                     if (percent >= 80 && percent < 90 && !elder.isSendMessageAt80Percent()) {
                         fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!")
