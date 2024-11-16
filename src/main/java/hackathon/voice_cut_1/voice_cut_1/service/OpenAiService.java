@@ -34,11 +34,13 @@ public class OpenAiService {
     ) {
         log.info("check2-1");
 
-        String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
-
-        log.info("check2-2");
-
-        return CompletableFuture.completedFuture(text);
+        try {
+            String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
+            return CompletableFuture.completedFuture(text);
+        } catch (Exception e) {
+            log.info("check2-2 error");
+            return CompletableFuture.failedFuture(new RuntimeException("check2-2 error"));
+        }
     }
 
     // TODO: 추후 ollama 도입 시 수정
@@ -60,10 +62,12 @@ public class OpenAiService {
 
         GptFeignClientResponse response = gptFeignClient.analyzeText("Bearer " + openAiKey, requestBody);
 
-        int percent = Integer.parseInt(response.choices().get(0).message().content());
-
-        log.info("check3-2");
-
-        return CompletableFuture.completedFuture(percent);
+        try {
+            int percent = Integer.parseInt(response.choices().get(0).message().content());
+            return CompletableFuture.completedFuture(percent);
+        } catch (Exception e) {
+            log.info("check3-2 error");
+            return CompletableFuture.failedFuture(new RuntimeException("check3-2 error"));
+        }
     }
 }
