@@ -1,7 +1,5 @@
 package hackathon.voice_cut_1.voice_cut_1.service;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Notification;
 import hackathon.voice_cut_1.voice_cut_1.entity.Elder;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ public class VoicePhishingAnalysisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final OpenAiService openAiService;
+    private final FcmService fcmService;
     private final SmsService smsService;
 
     public void analysisVoicePhishing(
@@ -42,28 +41,17 @@ public class VoicePhishingAnalysisService {
                     log.info("text: {}, percent: {}", text, percent);
 
                     if (percent >= 80 && percent < 90 && !elder.isSendMessageAt80Percent()) {
-                        sendAlarmToSelf(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!");
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!");
 
                         redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, false));
 
                     } else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
-                        sendAlarmToSelf(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!");
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!");
 
                         // TODO: 예외 처리 추가
                         smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers())
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, true)));
                     }
                 });
-    }
-
-    private void sendAlarmToSelf(
-            String fcmToken,
-            String body) {
-        com.google.firebase.messaging.Message message = com.google.firebase.messaging.Message.builder()
-                .setToken(fcmToken)
-                .setNotification(Notification.builder().setTitle("[음성감독원] 보이스 피싱 경고").setBody(body).build())
-                .build();
-
-        FirebaseMessaging.getInstance().sendAsync(message);
     }
 }
