@@ -32,9 +32,11 @@ public class OpenAiService {
     public CompletableFuture<String> convertSpeechToTextAsync(
             MultipartFile voiceFile
     ) {
+        log.info("check2-1");
+
         String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
 
-        log.info("check2");
+        log.info("check2-2");
 
         return CompletableFuture.completedFuture(text);
     }
@@ -54,11 +56,13 @@ public class OpenAiService {
                                 "Response format must be a single integer percentage:\n" + text)
         });
 
+        log.info("check3-1");
+
         GptFeignClientResponse response = gptFeignClient.analyzeText("Bearer " + openAiKey, requestBody);
 
         int percent = Integer.parseInt(response.choices().get(0).message().content());
 
-        log.info("check3");
+        log.info("check3-2");
 
         return CompletableFuture.completedFuture(percent);
     }
