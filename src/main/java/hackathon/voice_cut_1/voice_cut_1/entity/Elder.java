@@ -11,5 +11,8 @@ public class Elder {
 
     private String nickname;
     private Collection<String> guardianNumbers;
+    private boolean sendMessageAt80Percent;
     private boolean sendMessageAt90Percent;
+    private String fcmToken;
+
 }

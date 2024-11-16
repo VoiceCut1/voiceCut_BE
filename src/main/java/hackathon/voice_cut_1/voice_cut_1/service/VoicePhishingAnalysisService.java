@@ -1,5 +1,7 @@
 package hackathon.voice_cut_1.voice_cut_1.service;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Notification;
 import hackathon.voice_cut_1.voice_cut_1.dto.VoicePhishingAnalysisResultDto;
 import hackathon.voice_cut_1.voice_cut_1.entity.Elder;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
@@ -69,13 +71,20 @@ public class VoicePhishingAnalysisService {
 
         int percent = analyzeText(text);
 
-        // TODO: FCM 로직 추기
+        //Fcm 기능 추가
+        if (percent >= 80 && percent < 90  && !elder.isSendMessageAt80Percent()){
+            sendAlarmToSelf(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!");
 
-        if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
+            redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true,false
+                    , elder.getFcmToken()));
+
+        }
+        else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
+            sendAlarmToSelf(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!");
             sendSmsToGuardianNumbers(elder.getNickname(), elder.getGuardianNumbers());
 
             // Q-noah: 트랜잭션 없어도 되는가?
-            redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true));
+            redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true,true, elder.getFcmToken()));
         }
 
         // NOTI-noah: 일단 비동기 처리를 하지 않았기 때문에 응답을 전달한다.
@@ -129,5 +138,14 @@ public class VoicePhishingAnalysisService {
         } catch (NurigoMessageNotReceivedException | NurigoEmptyResponseException | NurigoUnknownException exception) {
             throw new SmsSendFailedException();
         }
+    }
+
+    private void sendAlarmToSelf(String fcmToken, String body) {
+        com.google.firebase.messaging.Message message = com.google.firebase.messaging.Message.builder()
+                .setToken(fcmToken)
+                .setNotification(Notification.builder().setTitle("[음성감독원] 보이스 피싱 경고").setBody(body).build())
+                .build();
+
+        FirebaseMessaging.getInstance().sendAsync(message);
     }
 }

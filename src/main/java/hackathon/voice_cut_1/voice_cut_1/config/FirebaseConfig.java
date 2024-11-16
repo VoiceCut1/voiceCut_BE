@@ -12,7 +12,7 @@ import java.io.InputStream;
 public class FirebaseConfig {
     @PostConstruct
     public void initializeFirebase() {
-        try (InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase/serviceAccountKey.json")) {
+        try (InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("key/fcmKey.json")) {
             if (serviceAccount == null) {
                 throw new RuntimeException("Firebase service account file not found");
             }
