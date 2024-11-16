@@ -41,19 +41,17 @@ public class VoicePhishingAnalysisService {
 
                     log.info("text: {}, percent: {}", text, percent);
 
-                    //Fcm 기능 추가
-                    if (percent >= 80 && percent < 90  && !elder.isSendMessageAt80Percent()){
+                    if (percent >= 80 && percent < 90 && !elder.isSendMessageAt80Percent()) {
                         sendAlarmToSelf(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!");
 
-                        redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true,false
-                                , elder.getFcmToken()));
+                        redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, false));
 
                     } else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
                         sendAlarmToSelf(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!");
 
                         // TODO: 예외 처리 추가
                         smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers())
-                                .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true)));
+                                .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, true)));
                     }
                 });
     }

@@ -10,9 +10,8 @@ import java.util.Collection;
 public class Elder {
 
     private String nickname;
+    private String fcmToken;
     private Collection<String> guardianNumbers;
     private boolean sendMessageAt80Percent;
     private boolean sendMessageAt90Percent;
-    private String fcmToken;
-
 }

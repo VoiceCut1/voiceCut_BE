@@ -19,7 +19,7 @@ public class ElderController {
     public ResponseEntity<SaveElderInformationResponse> saveElderInformation(
             @Valid @RequestBody SaveElderInformationRequest request
     ) {
-        String uuid = elderService.saveElderInformationFromRedis(request.nickname(), request.guardianNumbers(), request.fcmToken());
+        String uuid = elderService.saveElderInformationFromRedis(request.nickname(), request.fcmToken(), request.guardianNumbers());
 
         return ResponseEntity.ok(new SaveElderInformationResponse(uuid));
     }
