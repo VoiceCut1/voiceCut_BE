@@ -52,8 +52,6 @@ public class VoicePhishingAnalysisService {
                                     return null;
                                 });
                     } else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
-                        // Q-noah. SMS 이후 FCM이 처리되는 경우, 90% 변수에 문제가 없는가?
-
                         fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!")
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, false)))
                                 .exceptionally(throwable -> {
