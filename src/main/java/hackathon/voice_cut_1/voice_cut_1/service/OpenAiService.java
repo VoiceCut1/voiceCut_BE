@@ -34,6 +34,10 @@ public class OpenAiService {
     ) {
         log.info("check2-1");
 
+        if (voiceFile == null || voiceFile.isEmpty()) {
+            log.info("check2-1, voiceFile is null");
+        }
+
         try {
             String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
             return CompletableFuture.completedFuture(text);
