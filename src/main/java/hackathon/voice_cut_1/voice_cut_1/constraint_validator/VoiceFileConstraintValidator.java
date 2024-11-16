@@ -15,6 +15,6 @@ public class VoiceFileConstraintValidator implements ConstraintValidator<VoiceFi
 
         String fileName = multipartFile.getOriginalFilename();
 
-        return fileName != null && fileName.toLowerCase().endsWith("." + "mp4");
+        return fileName != null && fileName.toLowerCase().endsWith("." + "m4a");
     }
 }
