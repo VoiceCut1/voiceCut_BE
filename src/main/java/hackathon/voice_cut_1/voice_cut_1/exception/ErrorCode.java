@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "ELDER_NOT_FOUND"),
+    FCM_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FCM_SEND_FAILED"),
     SMS_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SMS_SEND_FAILED");
 
     private final HttpStatus httpStatus;
