@@ -5,11 +5,13 @@ import hackathon.voice_cut_1.voice_cut_1.feign_client.WhisperFeignClient;
 import hackathon.voice_cut_1.voice_cut_1.response.GptFeignClientResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -25,15 +27,19 @@ public class OpenAiService {
     private String openAiGptModel;
 
     // TODO: 외부 API 예외 처리 필요
-    public String convertSpeechToText(
+    @Async
+    public CompletableFuture<String> convertSpeechToTextAsync(
             MultipartFile voiceFile
     ) {
-        return whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
+        String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
+
+        return CompletableFuture.completedFuture(text);
     }
 
     // TODO: 외부 API 예외 처리 필요
     // TODO: 추후 ollama 도입 시 수정
-    public int analyzeText(
+    @Async
+    public CompletableFuture<Integer> analyzeTextAsync(
             String text
     ) {
         Map<String, Object> requestBody = new HashMap<>();
@@ -48,6 +54,8 @@ public class OpenAiService {
 
         GptFeignClientResponse response = gptFeignClient.analyzeText("Bearer " + openAiKey, requestBody);
 
-        return Integer.parseInt(response.choices().get(0).message().content());
+        int percent = Integer.parseInt(response.choices().get(0).message().content());
+
+        return CompletableFuture.completedFuture(percent);
     }
 }

@@ -1,11 +1,11 @@
 package hackathon.voice_cut_1.voice_cut_1.service;
 
-import hackathon.voice_cut_1.voice_cut_1.dto.VoicePhishingAnalysisResultDto;
 import hackathon.voice_cut_1.voice_cut_1.entity.Elder;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
 import hackathon.voice_cut_1.voice_cut_1.exception.SmsSendFailedException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.exception.NurigoEmptyResponseException;
 import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VoicePhishingAnalysisService {
@@ -45,7 +46,7 @@ public class VoicePhishingAnalysisService {
         messageService = NurigoApp.INSTANCE.initialize(coolsmsKey, coolsmsSecretKey, coolsmsDomain);
     }
 
-    public VoicePhishingAnalysisResultDto analysisVoicePhishing(
+    public void analysisVoicePhishing(
             String uuid,
             MultipartFile voiceFile
     ) {
@@ -55,21 +56,24 @@ public class VoicePhishingAnalysisService {
             throw new ElderNotFoundException();
         }
 
-        String text = openAiService.convertSpeechToText(voiceFile);
+        // TODO: 예외 처리 추가
+        openAiService.convertSpeechToTextAsync(voiceFile)
+                .thenCompose(text -> openAiService.analyzeTextAsync(text)
+                        .thenApply(percent -> Map.of("text", text, "percent", percent)))
+                .thenAccept(result -> {
+                    String text = (String) result.get("text");
+                    int percent = (Integer) result.get("percent");
 
-        int percent = openAiService.analyzeText(text);
+                    log.info("text: {}, percent: {}", text, percent);
 
-        // TODO: FCM 로직 추기
+                    // TODO: FCM 로직 추기
 
-        if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
-            sendSmsToGuardianNumbers(elder.getNickname(), elder.getGuardianNumbers());
+                    if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
+                        sendSmsToGuardianNumbers(elder.getNickname(), elder.getGuardianNumbers());
 
-            // Q-noah: 트랜잭션 없어도 되는가?
-            redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true));
-        }
-
-        // NOTI-noah: 일단 비동기 처리를 하지 않았기 때문에 응답을 전달한다.
-        return new VoicePhishingAnalysisResultDto(text, percent);
+                        redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getGuardianNumbers(), true));
+                    }
+                });
     }
 
     private void sendSmsToGuardianNumbers(
