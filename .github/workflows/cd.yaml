@@ -16,6 +16,9 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew build -x test
+      - name: Copy Firebase Key to Build Context
+        run: |
+          cp /home/admin/voice-cut-1/fcmKey.json ./src/main/resources/key/fcmKey.json
       - name: Build Docker Image
         run: |
           sudo docker build -f ./docker/voice-cut-1_prod/Dockerfile -t spring-app:latest .
