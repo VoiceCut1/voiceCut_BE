@@ -35,6 +35,8 @@ public class VoicePhishingAnalysisService {
             throw new ElderNotFoundException();
         }
 
+        log.info("check1");
+
         openAiService.convertSpeechToTextAsync(voiceFile)
                 .thenCompose(text -> openAiService.analyzeTextAsync(text)
                         .thenApply(percent -> Map.of("text", text, "percent", percent)))

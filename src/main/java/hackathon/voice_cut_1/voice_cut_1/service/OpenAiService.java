@@ -4,6 +4,7 @@ import hackathon.voice_cut_1.voice_cut_1.feign_client.GptFeignClient;
 import hackathon.voice_cut_1.voice_cut_1.feign_client.WhisperFeignClient;
 import hackathon.voice_cut_1.voice_cut_1.response.GptFeignClientResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OpenAiService {
@@ -31,6 +33,8 @@ public class OpenAiService {
             MultipartFile voiceFile
     ) {
         String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
+
+        log.info("check2");
 
         return CompletableFuture.completedFuture(text);
     }
@@ -53,6 +57,8 @@ public class OpenAiService {
         GptFeignClientResponse response = gptFeignClient.analyzeText("Bearer " + openAiKey, requestBody);
 
         int percent = Integer.parseInt(response.choices().get(0).message().content());
+
+        log.info("check3");
 
         return CompletableFuture.completedFuture(percent);
     }
