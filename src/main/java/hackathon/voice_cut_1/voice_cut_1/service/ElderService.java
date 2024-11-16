@@ -17,11 +17,12 @@ public class ElderService {
 
     public String saveElderInformationFromRedis(
             String nickname,
-            Collection<String> guardianNumbers
+            Collection<String> guardianNumbers,
+            String fcmToken
     ) {
         String uuid = UUID.randomUUID().toString();
 
-        redisTemplate.opsForValue().set(uuid, new Elder(nickname, guardianNumbers, false), 1, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(uuid, new Elder(nickname, guardianNumbers,false, false, fcmToken), 1, TimeUnit.DAYS);
 
         return uuid;
     }

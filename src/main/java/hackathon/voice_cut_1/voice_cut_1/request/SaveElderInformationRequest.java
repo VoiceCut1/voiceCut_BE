@@ -8,6 +8,7 @@ import java.util.Collection;
 
 public record SaveElderInformationRequest(
         @NotBlank String nickname,
-        @NotEmpty Collection<@NotBlank @Pattern(regexp = "\\d+") String> guardianNumbers
+        @NotEmpty Collection<@NotBlank @Pattern(regexp = "\\d+") String> guardianNumbers,
+        @NotBlank String fcmToken
 ) {
 }
