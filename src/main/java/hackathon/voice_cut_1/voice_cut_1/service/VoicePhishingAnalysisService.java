@@ -37,6 +37,10 @@ public class VoicePhishingAnalysisService {
 
         log.info("check1");
 
+        if (voiceFile == null || voiceFile.isEmpty()) {
+            log.info("check1, voiceFile is null");
+        }
+
         openAiService.convertSpeechToTextAsync(voiceFile)
                 .thenCompose(text -> openAiService.analyzeTextAsync(text)
                         .thenApply(percent -> Map.of("text", text, "percent", percent)))
