@@ -26,7 +26,6 @@ public class OpenAiService {
     @Value("${openai.gpt.model}")
     private String openAiGptModel;
 
-    // TODO: 외부 API 예외 처리 필요
     @Async
     public CompletableFuture<String> convertSpeechToTextAsync(
             MultipartFile voiceFile
@@ -36,7 +35,6 @@ public class OpenAiService {
         return CompletableFuture.completedFuture(text);
     }
 
-    // TODO: 외부 API 예외 처리 필요
     // TODO: 추후 ollama 도입 시 수정
     @Async
     public CompletableFuture<Integer> analyzeTextAsync(
