@@ -32,5 +32,4 @@ jobs:
             --network voice-cut-1 \
             -p 8080:8080 \
             --env-file /home/admin/voice-cut-1/.env \
-            -v /home/admin/voice-cut-1/fcmKey.json:/app/config/key/fcmKey.json \
             spring-app:latest
