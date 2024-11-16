@@ -1,0 +1,36 @@
+name: CD
+
+on:
+  push:
+    branches: [ deploy ]
+  pull_request:
+    branches: [ deploy ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+      - name: Build Docker Image
+        run: |
+          sudo docker build -f ./docker/voice-cut-1_prod/Dockerfile -t spring-app:latest .
+      - name: Stop Existing Container
+        run: |
+          sudo docker rm -f spring-app || echo "No container running"
+      - name: Remove Dangling Images
+        run: |
+          sudo docker images -f "dangling=true" -q | xargs -r sudo docker rmi
+      - name: Run Docker Container
+        run: |
+          sudo docker run -d \
+            --name spring-app \
+            --network voice-cut-1 \
+            -p 8080:8080 \
+            --env-file /home/admin/voice-cut-1/.env \
+            -v /home/admin/voice-cut-1/fcmKey.json:/app/config/key/fcmKey.json \
+            spring-app:latest
