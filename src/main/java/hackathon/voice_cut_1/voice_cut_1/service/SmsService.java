@@ -33,7 +33,7 @@ public class SmsService {
     ) {
         List<Message> messages = new ArrayList<>();
 
-        text = "[" + nickname + "]님이 지금하고 계신 통화가 보이스피싱으로 매우 의심됩니다!\n주요 통화 내용 : " + text;
+        text = "\"" + nickname + "\"님이 지금하고 계신 통화가 보이스피싱으로 매우 의심됩니다!\n\n[주요 통화 내용] " + text;
 
         for (String guardianNumber : guardianNumbers) {
             Message message = new Message();
