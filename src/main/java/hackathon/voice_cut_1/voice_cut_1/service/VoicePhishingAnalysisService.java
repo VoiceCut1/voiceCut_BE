@@ -57,7 +57,7 @@ public class VoicePhishingAnalysisService {
                                     return null;
                                 });
 
-                        smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers())
+                        smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers(), text)
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, true)))
                                 .exceptionally(throwable -> {
                                     discordNotificationService.sendExceptionMessageAsync(getSmsExceptionMessage(throwable));
