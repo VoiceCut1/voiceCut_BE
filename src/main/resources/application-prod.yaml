@@ -19,4 +19,7 @@ coolsms:
 
 discord:
   webhook:
-    url: ${DISCORD-WEBHOOK-URL}
+    text-and-percent:
+      url: ${DISCORD-WEBHOOK-TEXT-AND-PERCENT-URL}
+    exception:
+      url: ${DISCORD-WEBHOOK-EXCEPTION-URL}
