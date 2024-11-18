@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hackathon.voice_cut_1.voice_cut_1.entity.Elder;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VoicePhishingAnalysisService {
@@ -42,24 +40,24 @@ public class VoicePhishingAnalysisService {
                     String text = (String) result.get("text");
                     int percent = (Integer) result.get("percent");
 
-                    log.debug("text: {}, percent: {}", text, percent);
+                    discordNotificationService.sendTextAndPercentAsync(text, percent);
 
-                    if (percent >= 80 && percent < 90 && !elder.isSendMessageAt80Percent()) {
-                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!")
+                    if (percent >= 80 && !elder.isSendMessageAt80Percent()) {
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "[보이스피싱 주의]", "현재 통화가 보이스피싱으로 의심됩니다.")
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, elder.isSendMessageAt90Percent())))
                                 .exceptionally(throwable -> {
                                     discordNotificationService.sendExceptionMessageAsync(getFcmExceptionMessage(throwable));
                                     return null;
                                 });
                     } else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
-                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!")
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "[보이스피싱 경고]", "현재 통화가 보이스피싱일 가능성이 매우 높습니다!")
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, elder.isSendMessageAt90Percent())))
                                 .exceptionally(throwable -> {
                                     discordNotificationService.sendExceptionMessageAsync(getFcmExceptionMessage(throwable));
                                     return null;
                                 });
 
-                        smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers())
+                        smsService.sendSmsToGuardianNumbersAsync(elder.getNickname(), elder.getGuardianNumbers(), text)
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, true)))
                                 .exceptionally(throwable -> {
                                     discordNotificationService.sendExceptionMessageAsync(getSmsExceptionMessage(throwable));
@@ -71,6 +69,13 @@ public class VoicePhishingAnalysisService {
                     discordNotificationService.sendExceptionMessageAsync(getOpenAiExceptionMessage(throwable));
                     return null;
                 });
+
+        // MultipartFile 생명주기 문제 확인
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ignored) {
+
+        }
     }
 
     private String getOpenAiExceptionMessage(Throwable throwable) {

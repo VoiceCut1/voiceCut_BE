@@ -1,0 +1,25 @@
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST}
+
+openai:
+  key: ${OPENAI_KEY}
+  gpt:
+    url: ${OPENAI_GPT_URL}
+    model: ${OPENAI_GPT_MODEL}
+  whisper:
+    url: ${OPENAI_WHISPER_URL}
+
+coolsms:
+  key: ${COOLSMS-KEY}
+  secret-key: ${COOLSMS-SECRET-KEY}
+  domain: ${COOLSMS-DOMAIN}
+  calling-number: ${COOLSMS-CALLING-NUMBER}
+
+discord:
+  webhook:
+    text-and-percent:
+      url: ${DISCORD-WEBHOOK-TEXT-AND-PERCENT-URL}
+    exception:
+      url: ${DISCORD-WEBHOOK-EXCEPTION-URL}
