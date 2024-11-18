@@ -5,15 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hackathon.voice_cut_1.voice_cut_1.entity.Elder;
 import hackathon.voice_cut_1.voice_cut_1.exception.ElderNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VoicePhishingAnalysisService {
@@ -36,12 +33,6 @@ public class VoicePhishingAnalysisService {
             throw new ElderNotFoundException();
         }
 
-        log.info("check1");
-
-        if (voiceFile == null || voiceFile.isEmpty()) {
-            log.info("check1, voiceFile is null");
-        }
-
         openAiService.convertSpeechToTextAsync(voiceFile)
                 .thenCompose(text -> openAiService.analyzeTextAsync(text)
                         .thenApply(percent -> Map.of("text", text, "percent", percent)))
@@ -49,7 +40,7 @@ public class VoicePhishingAnalysisService {
                     String text = (String) result.get("text");
                     int percent = (Integer) result.get("percent");
 
-                    log.info("text: {}, percent: {}", text, percent);
+                    discordNotificationService.sendTextAndPercentAsync(text, percent);
 
                     if (percent >= 80 && !elder.isSendMessageAt80Percent()) {
                         fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!")
@@ -81,9 +72,9 @@ public class VoicePhishingAnalysisService {
 
         // MultipartFile 생명주기 문제 확인
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.error("sleep: {}", e.getMessage());
+            Thread.sleep(500);
+        } catch (InterruptedException ignored) {
+
         }
     }
 

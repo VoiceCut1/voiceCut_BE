@@ -15,8 +15,36 @@ import java.net.http.HttpResponse;
 @Service
 public class DiscordNotificationService {
 
-    @Value("${discord.webhook.url}")
-    private String discordWebhookUrl;
+    @Value("${discord.webhook.text-and-percent.url}")
+    private String discordWebhookTextAndPercentUrl;
+
+    @Value("${discord.webhook.exception.url}")
+    private String discordWebhookExceptionUrl;
+
+    public void sendTextAndPercentAsync(
+            String text,
+            int percent
+    ) {
+        String payload = String.format("{\"content\": \"Text: %s\nPercent: %d%%\"}", text, percent);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(discordWebhookTextAndPercentUrl))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build();
+
+        HttpClient.newHttpClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.discarding())
+                .thenAccept(response -> {
+                    if (response.statusCode() != 204) {
+                        log.error("Failed to send discord notification, HTTP status code: {}", response.statusCode());
+                    }
+                })
+                .exceptionally(throwable -> {
+                    log.error("Failed to send discord notification: {}", throwable.getMessage());
+                    return null;
+                });
+    }
 
     public void sendExceptionMessageAsync(
             String exceptionMessage
@@ -24,7 +52,7 @@ public class DiscordNotificationService {
         String payload = String.format("{\"content\": \"%s\"}", exceptionMessage);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(discordWebhookUrl))
+                .uri(URI.create(discordWebhookExceptionUrl))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .POST(HttpRequest.BodyPublishers.ofString(payload))
                 .build();
