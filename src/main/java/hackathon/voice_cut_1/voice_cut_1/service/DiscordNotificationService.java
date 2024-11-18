@@ -25,7 +25,7 @@ public class DiscordNotificationService {
             String text,
             int percent
     ) {
-        String payload = String.format("{\"content\": \"Text: %s\nPercent: %d%%\"}", text, percent);
+        String payload = String.format("{\"content\": \"Text: %s, Percent: %d%%\"}", text, percent);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(discordWebhookTextAndPercentUrl))
