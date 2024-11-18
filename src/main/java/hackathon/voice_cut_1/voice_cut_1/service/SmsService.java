@@ -37,7 +37,8 @@ public class SmsService {
             Message message = new Message();
             message.setFrom(coolsmsCallingNumber);
             message.setTo(guardianNumber);
-            message.setText("[" + nickname + "]님이 지금하고 계신 통화가 보이스피싱으로 매우 의심됩니다!\n주요 통화 내용 : " + text);
+            message.setText("노노아 테스트");
+//            message.setText("[" + nickname + "]님이 지금하고 계신 통화가 보이스피싱으로 매우 의심됩니다!\n주요 통화 내용 : " + text);
 
             messages.add(message);
         }
