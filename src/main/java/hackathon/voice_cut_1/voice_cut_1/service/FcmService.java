@@ -16,13 +16,14 @@ public class FcmService {
 
     public CompletableFuture<Void> sendFcmToSelfAsync(
             String fcmToken,
+            String title,
             String body
     ) {
         Message message = Message.builder()
                 .setToken(fcmToken)
                 .setNotification(
                         Notification.builder()
-                                .setTitle("[음성감독원] 보이스 피싱 경고")
+                                .setTitle(title)
                                 .setBody(body)
                                 .build()
                 )

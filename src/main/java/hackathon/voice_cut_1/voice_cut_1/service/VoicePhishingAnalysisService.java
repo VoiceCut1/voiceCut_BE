@@ -43,14 +43,14 @@ public class VoicePhishingAnalysisService {
                     discordNotificationService.sendTextAndPercentAsync(text, percent);
 
                     if (percent >= 80 && !elder.isSendMessageAt80Percent()) {
-                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 높습니다!")
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "[보이스피싱 주의]", "현재 통화가 보이스피싱으로 의심됩니다.")
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, elder.isSendMessageAt90Percent())))
                                 .exceptionally(throwable -> {
                                     discordNotificationService.sendExceptionMessageAsync(getFcmExceptionMessage(throwable));
                                     return null;
                                 });
                     } else if (percent >= 90 && !elder.isSendMessageAt90Percent()) {
-                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "경고 : 현재 통화는 보이스 피싱일 가능성이 아주 높습니다!")
+                        fcmService.sendFcmToSelfAsync(elder.getFcmToken(), "[보이스피싱 경고]", "현재 통화가 보이스피싱일 가능성이 매우 높습니다!")
                                 .thenAccept(ignored -> redisTemplate.opsForValue().set(uuid, new Elder(elder.getNickname(), elder.getFcmToken(), elder.getGuardianNumbers(), true, elder.isSendMessageAt90Percent())))
                                 .exceptionally(throwable -> {
                                     discordNotificationService.sendExceptionMessageAsync(getFcmExceptionMessage(throwable));
