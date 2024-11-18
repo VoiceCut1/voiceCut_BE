@@ -1,5 +1,7 @@
 package hackathon.voice_cut_1.voice_cut_1.service;
 
+import hackathon.voice_cut_1.voice_cut_1.exception.GptFeignClientException;
+import hackathon.voice_cut_1.voice_cut_1.exception.WhisperFeignClientException;
 import hackathon.voice_cut_1.voice_cut_1.feign_client.GptFeignClient;
 import hackathon.voice_cut_1.voice_cut_1.feign_client.WhisperFeignClient;
 import hackathon.voice_cut_1.voice_cut_1.response.GptFeignClientResponse;
@@ -32,18 +34,14 @@ public class OpenAiService {
     public CompletableFuture<String> convertSpeechToTextAsync(
             MultipartFile voiceFile
     ) {
-        log.info("check2-1");
-
-        if (voiceFile == null || voiceFile.isEmpty()) {
-            log.info("check2-1, voiceFile is null");
-        }
-
         try {
             String text = whisperFeignClient.convertSpeechToText("Bearer " + openAiKey, voiceFile, "whisper-1").text();
+
             return CompletableFuture.completedFuture(text);
         } catch (Exception e) {
-            log.info("check2-2 error: {}", e.getMessage());
-            return CompletableFuture.failedFuture(new RuntimeException("check2-2 error"));
+            log.error("OpenAiService.convertSpeechToTextAsync.Exception: {}", e.getMessage());
+
+            return CompletableFuture.failedFuture(new WhisperFeignClientException());
         }
     }
 
@@ -62,16 +60,15 @@ public class OpenAiService {
                                 "Response format must be a single integer percentage:\n" + text)
         });
 
-        log.info("check3-1");
-
         GptFeignClientResponse response = gptFeignClient.analyzeText("Bearer " + openAiKey, requestBody);
 
         try {
             int percent = Integer.parseInt(response.choices().get(0).message().content());
             return CompletableFuture.completedFuture(percent);
         } catch (Exception e) {
-            log.info("check3-2 error: {}", e.getMessage());
-            return CompletableFuture.failedFuture(new RuntimeException("check3-2 error"));
+            log.error("OpenAiService.analyzeTextAsync.Exception: {}", e.getMessage());
+
+            return CompletableFuture.failedFuture(new GptFeignClientException());
         }
     }
 }
